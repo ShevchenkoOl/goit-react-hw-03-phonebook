@@ -1,4 +1,5 @@
 import { Component } from 'react';
+import { ToastContainer, toast } from 'react-toastify';
 import shortid from 'shortid';
 import Container from './components/Container/Container';
 import ContactForm from './components/ContactForm/ContactForm';
@@ -7,14 +8,27 @@ import ContactList from './components/ContactLis/ContactList';
 
 class App extends Component {
   state = {
-    contacts: [
-      { id: shortid.generate(), name: 'Rosa Felice', number: '775-44-55' },
-      { id: shortid.generate(), name: 'Kevin Kleine', number: '885-14-14' },
-      { id: shortid.generate(), name: 'Giorgio Armani', number: '874-55-21' },
-      { id: shortid.generate(), name: 'Henri Ford', number: '785-15-63' },
-    ],
+    contacts: [],
     filter: '',
+    
   };
+  componentDidMount() {
+    const contacts = localStorage.getItem('contacts');
+    const parsedContacts = JSON.parse(contacts);
+
+    if (parsedContacts) {
+      this.setState({ contacts: parsedContacts });
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    const nextContacts = this.state.contacts;
+    const prevContacts = prevState.contacts;
+
+    if (nextContacts !== prevContacts) {
+      localStorage.setItem('contacts', JSON.stringify(nextContacts));
+    }
+  }
 
   addContact = ({ name, number }) => {
     const contact = {
@@ -82,6 +96,7 @@ class App extends Component {
         ) : (
           <p>Your phonebook is empty. Please add contact.</p>
         )}
+        <ToastContainer autoClose={3700} />
       </Container>
     );
   }
